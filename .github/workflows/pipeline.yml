@@ -44,11 +44,13 @@ jobs:
 
       - name: Run Ansible Playbook using Docker
         run: |
+          # Fix permissions inside the container
           docker run --rm \
           -v $(pwd):/workspace \
+          -v ~/.ssh:/root/.ssh \
           ${{ env.ANSIBLE_IMAGE }} \
-          bash -c "ansible-playbook -v /workspace/.ansible/deploy-dev.yaml \
-          -i /workspace/.ansible/host.yml \
+          bash -c "chown -R root:root /root && chmod 600 /root/.ssh/deploy && chmod 644 /root/.ssh/config && ansible-playbook -v /workspace/.ansible/deploy-master.yaml \
+          --private-key=/root/.ssh/deploy -i /workspace/.ansible/inventory/hosts \
           -e docker_registry_creds_username=${{ secrets.CI_REGISTRY_USER }} \
           -e docker_registry_creds_password=${{ secrets.CI_REGISTRY_PASSWORD }} \
           -e docker_registry_data=${{ secrets.CI_REGISTRY_IMAGE }} \
