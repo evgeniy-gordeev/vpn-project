@@ -47,8 +47,8 @@ jobs:
           docker run --rm \
           -v $(pwd):/workspace \
           ${{ env.ANSIBLE_IMAGE }} \
-          bash -c "ansible-playbook -v /workspace/vpn-project/.ansible/deploy-dev.yaml \
-          -i /workspace/vpn-project/.ansible/host.yml \
+          bash -c "ansible-playbook -v /workspace/.ansible/deploy-dev.yaml \
+          -i /workspace/.ansible/host.yml \
           -e docker_registry_creds_username=${{ secrets.CI_REGISTRY_USER }} \
           -e docker_registry_creds_password=${{ secrets.CI_REGISTRY_PASSWORD }} \
           -e docker_registry_data=${{ secrets.CI_REGISTRY_IMAGE }} \
