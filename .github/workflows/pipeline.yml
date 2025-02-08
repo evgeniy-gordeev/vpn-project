@@ -47,9 +47,10 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_DEPLOY_KEY }}" | tr -d '\r' > ~/.ssh/deploy
-          chmod 777 ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-          chmod 777 ~/.ssh/config
+          chmod 644 ~/.ssh/config
+          chmod 700 ~/.ssh
 
       - name: Check SSH Connection
         run: |
@@ -61,7 +62,7 @@ jobs:
           -v $(pwd):/workspace \
           -v ~/.ssh:/root/.ssh \
           ${{ env.ANSIBLE_IMAGE }} \
-          bash -c "chown -R root:root /root && chmod 777 /root/.ssh/deploy && chmod 777 /root/.ssh/config && ansible-playbook -v /workspace/.ansible/deploy-dev.yaml \
+          bash -c "chown -R root:root /root && chmod 600 /root/.ssh/deploy && chmod 644 /root/.ssh/config && ansible-playbook -v /workspace/.ansible/deploy-dev.yaml \
           --private-key=/root/.ssh/deploy -i /workspace/.ansible/inventory/hosts \
           -e docker_registry_creds_username=${{ secrets.CI_REGISTRY_USER }} \
           -e docker_registry_creds_password=${{ secrets.CI_REGISTRY_PASSWORD }} \
