@@ -55,7 +55,7 @@ jobs:
           -v $(pwd):/workspace \
           -v ~/.ssh:/root/.ssh \
           ${{ env.ANSIBLE_IMAGE }} \
-          bash -c "chown -R root:root /root && chmod 600 /root/.ssh/deploy && chmod 644 /root/.ssh/config && ansible-playbook -v /workspace/deploy-dev.yaml \
+          bash -c "chown -R root:root /root && chmod 600 /root/.ssh/deploy && chmod 644 /root/.ssh/config && ansible-playbook -v /workspace/.ansible/deploy-master.yaml \
           --private-key=/root/.ssh/deploy -i /workspace/host.yml \
           -e docker_registry_creds_username=${{ secrets.CI_REGISTRY_USER }} \
           -e docker_registry_creds_password=${{ secrets.CI_REGISTRY_PASSWORD }} \
