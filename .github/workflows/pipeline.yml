@@ -37,7 +37,7 @@ jobs:
     name: Deploy to Development
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop_gordeev'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
