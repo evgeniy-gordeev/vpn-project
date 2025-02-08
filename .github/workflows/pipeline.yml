@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - develop
+      - develop_gordeev
 
 env:
   ANSIBLE_IMAGE: "999669/ansible-3.5:latest"
