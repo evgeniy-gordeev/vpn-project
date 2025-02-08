@@ -7,7 +7,7 @@ on:
 
 env:
   ANSIBLE_IMAGE: "999669/ansible-3.5:latest"
-  DOCKERFILE: "vpn-project/.docker/Dockerfile"
+  DOCKERFILE: ".docker/Dockerfile"
 
 jobs:
   build:
