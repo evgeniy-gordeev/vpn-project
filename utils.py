@@ -71,15 +71,28 @@ def make_help_markup() -> telebot.types.InlineKeyboardMarkup:
     return markup
 
 
+
 def make_pay_markup() -> telebot.types.InlineKeyboardMarkup:
     markup = telebot.types.InlineKeyboardMarkup()
-    stars = telebot.types.InlineKeyboardButton("Telegram Stars", callback_data="buy_tg_stars")
-    crypt = telebot.types.InlineKeyboardButton("Cryptomus", callback_data="buy_cryptomus")
-    yoomoney = telebot.types.InlineKeyboardButton("YooMoney", callback_data="buy_yoomoney")
-    markup.add(stars)
-    markup.add(crypt)
-    markup.add(yoomoney)   
-    #Back
-    itembtn_str = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
-    markup.add(itembtn_str)    
+    pay_1_month = telebot.types.InlineKeyboardButton("1 месяц", callback_data="pay_1_month")
+    pay_4_month = telebot.types.InlineKeyboardButton("4 месяца", callback_data="pay_4_month")
+    pay_12_month = telebot.types.InlineKeyboardButton("12 месяцев", callback_data="pay_12_month")
+    markup.add(pay_1_month)
+    markup.add(pay_4_month)
+    markup.add(pay_12_month)
+    back = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
+    markup.add(back)
     return markup
+
+# def make_pay_markup() -> telebot.types.InlineKeyboardMarkup:
+#     markup = telebot.types.InlineKeyboardMarkup()
+#     stars = telebot.types.InlineKeyboardButton("Telegram Stars", callback_data="buy_tg_stars")
+#     crypt = telebot.types.InlineKeyboardButton("Cryptomus", url="https://pay.cryptomus.com/pay/f60edfeb-b7de-4bfe-a06d-2a336f4fa8dc")
+#     yoomoney = telebot.types.InlineKeyboardButton("YooMoney", callback_data="buy_yoomoney")
+#     markup.add(stars)
+#     markup.add(crypt)
+#     markup.add(yoomoney)   
+#     #Back
+#     itembtn_str = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
+#     markup.add(itembtn_str)    
+#     return markup

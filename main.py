@@ -87,7 +87,15 @@ def _connect(message):
 
 def _pay(message):
     markup = make_pay_markup()
-    bot.send_message(message.chat.id, 'Заплатить', reply_markup=markup)
+    text = """
+    Выберите оптимальный для вас тариф:
+
+    350₽ в месяц 
+    300₽ в месяц при оплате за 4 месяца
+    250₽ в месяц при оплате за 12 месяцев
+
+    💳 Можно оплатить приложением банка, СБП, любой картой РФ и криптовалютой."""
+    bot.send_message(message.chat.id, text=text, reply_markup=markup)
 
 
 def _help(message):
@@ -103,19 +111,33 @@ def make_config(query):
         message_id=query.message.id,
     )
 
-@bot.callback_query_handler(lambda query: query.data == "buy_tg_stars")
+
+@bot.callback_query_handler(lambda query: query.data in ["pay_1_month", "pay_4_month", "pay_12_month"])
 def handle_buy(query):
     markup = telebot.types.InlineKeyboardMarkup()
-    pay_1_month = telebot.types.InlineKeyboardButton("1 месяц", callback_data="buy_tg_stars_1")
-    markup.add(pay_1_month)
-    pay_4_month = telebot.types.InlineKeyboardButton("4 месяца", callback_data="buy_tg_stars_4")
-    markup.add(pay_4_month)
-    pay_12_month = telebot.types.InlineKeyboardButton("12 месяцев", callback_data="buy_tg_stars_12")
-    markup.add(pay_12_month)
-    itembtn_str = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
-    markup.add(itembtn_str)
-    bot.edit_message_text(chat_id=query.from_user.id, text='Выберете срок', reply_markup=markup, message_id=query.message.id)
-
+    if query.data == 'pay_1_month':
+        stars = telebot.types.InlineKeyboardButton("Telegram Stars", callback_data="buy_tg_stars_1")
+        crypt = telebot.types.InlineKeyboardButton("Cryptomus", url="https://pay.cryptomus.com/pay/f60edfeb-b7de-4bfe-a06d-2a336f4fa8dc") #1
+        yoomoney = telebot.types.InlineKeyboardButton("YooMoney", callback_data="buy_yoomoney")
+        text = "Доступ 1 Месяц"
+    elif query.data == 'pay_4_month':
+        stars = telebot.types.InlineKeyboardButton("Telegram Stars", callback_data="buy_tg_stars_4")
+        crypt = telebot.types.InlineKeyboardButton("Cryptomus", url="https://pay.cryptomus.com/pay/f60edfeb-b7de-4bfe-a06d-2a336f4fa8dc") #4
+        yoomoney = telebot.types.InlineKeyboardButton("YooMoney", callback_data="buy_yoomoney")  
+        text = text = "Доступ 4 Месяца"
+    else:
+        stars = telebot.types.InlineKeyboardButton("Telegram Stars", callback_data="buy_tg_stars_12")
+        crypt = telebot.types.InlineKeyboardButton("Cryptomus", url="https://pay.cryptomus.com/pay/f60edfeb-b7de-4bfe-a06d-2a336f4fa8dc") #12
+        yoomoney = telebot.types.InlineKeyboardButton("YooMoney", callback_data="buy_yoomoney")          
+        text = text = "Доступ 12 Месяцев"
+    markup.add(stars)
+    markup.add(crypt)
+    markup.add(yoomoney)
+    #back button
+    back = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
+    markup.add(back)
+    bot.send_message(chat_id=query.message.chat.id, text=text, reply_markup=markup)
+    return markup
 
 @bot.callback_query_handler(lambda query: query.data in ["buy_tg_stars_1", "buy_tg_stars_4", "buy_tg_stars_12"])
 def handle_buy(query):
@@ -123,7 +145,7 @@ def handle_buy(query):
     bot.send_invoice(
         chat_id=query.from_user.id, 
         title='Оплата в TG Stars', 
-        description='Выберете срок оплаты',
+        description=f'Доступ {n} месяцев',
         invoice_payload='subscription',
         currency='XTR',
         prices=prices_dict[n],
