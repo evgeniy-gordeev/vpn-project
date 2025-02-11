@@ -79,4 +79,7 @@ def make_pay_markup() -> telebot.types.InlineKeyboardMarkup:
     markup.add(stars)
     markup.add(crypt)
     markup.add(yoomoney)   
+    #Back
+    itembtn_str = telebot.types.InlineKeyboardButton("Назад", callback_data="back")
+    markup.add(itembtn_str)    
     return markup
