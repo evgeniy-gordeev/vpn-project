@@ -7,7 +7,9 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
-from utils import main_keyboard, make_back_inline_button_markup, make_connect_markup, make_pay_markup, make_help_markup
+from src.utils import main_keyboard, make_back_inline_button_markup, make_connect_markup, make_pay_markup, make_help_markup
+from src.database import get_urls_from_db, add_url_to_db
+from src.xray import XRaySSHInterface, encode_urls
 
 load_dotenv(override=True)
 
@@ -110,6 +112,27 @@ def make_config(query):
         text=f"Делаю конфиг",
         message_id=query.message.id,
     )
+
+# def cook_user_xray_link(user_id, host_ids=[0]):
+    
+#     # проверить наличие урлов юзеров в базе
+#     urls = get_urls_from_db(engine, user_id, host_ids)
+    
+#     if len(urls) == 0:
+        
+#         for id_ in host_ids:
+#             xray_ssh_client = XRaySSHInterface(host_ip=os.environ[f'HOST_{id_}'],
+#                                                username=os.environ[f'USER_{id_}'],
+#                                                password=os.environ[f'PASS_{id_}'])
+#             xray_ssh_client.add_xray_user(user_id) # создаем конфиг в xray
+#             url = xray_ssh_client.get_xray_url(user_id) # генерим урл
+#             urls.append(url)
+            
+#             add_url_to_db(engine, user_id, id_, url) # добавляем урл в базу
+            
+#     xray_link = encode_urls(urls) # кодируем урлы
+    
+#     return xray_link
 
 
 @bot.callback_query_handler(lambda query: query.data in ["pay_1_month", "pay_4_month", "pay_12_month"])
