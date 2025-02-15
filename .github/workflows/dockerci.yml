@@ -31,7 +31,7 @@ jobs:
       - name: SSH into VM and run update script
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: 5.101.2.221  
+          host: 195.133.39.63 
           username: ${{ secrets.VM_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}  
           port: 22
