@@ -121,11 +121,15 @@ def make_config(query):
 #     if len(urls) == 0:
         
 #         for id_ in host_ids:
+#             cwd_xray = "easy-xray-main"
+            
 #             xray_ssh_client = XRaySSHInterface(host_ip=os.environ[f'HOST_{id_}'],
 #                                                username=os.environ[f'USER_{id_}'],
-#                                                password=os.environ[f'PASS_{id_}'])
-#             xray_ssh_client.add_xray_user(user_id) # создаем конфиг в xray
-#             url = xray_ssh_client.get_xray_url(user_id) # генерим урл
+#                                                password=os.environ[f'PASS_{id_}'],
+#                                                sudo_password=os.environ[f'PASS_{id_}'])
+            
+#             xray_ssh_client.add_xray_user(user_id, cwd=cwd_xray) # создаем конфиг в xray
+#             url = xray_ssh_client.get_xray_url(user_id, cwd=cwd_xray) # генерим урл
 #             urls.append(url)
             
 #             add_url_to_db(engine, user_id, id_, url) # добавляем урл в базу
