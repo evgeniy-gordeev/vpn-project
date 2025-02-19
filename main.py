@@ -8,8 +8,10 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
 from src.utils import main_keyboard, make_back_inline_button_markup, make_connect_markup, make_pay_markup, make_help_markup
-from src.database import get_urls_from_db, add_url_to_db
-from src.xray import XRaySSHInterface, encode_urls
+from src.database import get_user_end_time
+from src.xray import cook_user_xray_link
+from src.const import HOST_IDS
+
 
 load_dotenv(override=True)
 
@@ -64,14 +66,7 @@ def _status(message):
     if not is_active_user(user_id):
         response = "У вас нет активной подписки"
     else:
-        with engine.begin() as connection:
-            sql_query = f"""
-                SELECT * 
-                FROM subs 
-                WHERE subs_id = {user_id}
-            """
-            df = pd.read_sql_query(sql_query, connection)
-        end_time = df['date_end'][0]
+        end_time = get_user_end_time(engine, user_id)
         response = f'Ваша подписка закончится `{end_time}`'
     markup = make_back_inline_button_markup()
     bot.send_message(message.chat.id, response, reply_markup=markup)
@@ -112,31 +107,11 @@ def make_config(query):
         text=f"Делаю конфиг",
         message_id=query.message.id,
     )
-
-# def cook_user_xray_link(user_id, host_ids=[0]):
-    
-#     # проверить наличие урлов юзеров в базе
-#     urls = get_urls_from_db(engine, user_id, host_ids)
-    
-#     if len(urls) == 0:
-        
-#         for id_ in host_ids:
-#             cwd_xray = "easy-xray-main"
-            
-#             xray_ssh_client = XRaySSHInterface(host_ip=os.environ[f'HOST_{id_}'],
-#                                                username=os.environ[f'USER_{id_}'],
-#                                                password=os.environ[f'PASS_{id_}'],
-#                                                sudo_password=os.environ[f'PASS_{id_}'])
-            
-#             xray_ssh_client.add_xray_user(user_id, cwd=cwd_xray) # создаем конфиг в xray
-#             url = xray_ssh_client.get_xray_url(user_id, cwd=cwd_xray) # генерим урл
-#             urls.append(url)
-            
-#             add_url_to_db(engine, user_id, id_, url) # добавляем урл в базу
-            
-#     xray_link = encode_urls(urls) # кодируем урлы
-    
-#     return xray_link
+    urls = cook_user_xray_link(user_id=query.from_user.id,
+                               host_ids=HOST_IDS)
+    bot.send_message(query.from_user.id, text='Готово! Скопируй следующие ссылки в свое приложение:')
+    for url in urls:
+        bot.send_message(query.from_user.id, text=f'{url}')
 
 
 @bot.callback_query_handler(lambda query: query.data in ["pay_1_month", "pay_4_month", "pay_12_month"])
@@ -276,9 +251,11 @@ def handle_start_trading(query):
     bot.delete_message(query.from_user.id, query.message.id)
 
 
-while True:
-    try:
-        bot.polling(none_stop=True)
-    except Exception as e:
-        print(e)
-        time.sleep(15)
+if __name__ == '__main__':
+
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception as e:
+            print(e)
+            time.sleep(15)

@@ -23,3 +23,14 @@ def add_url_to_db(eng, user_id, host_id, url):
     with eng.begin() as conn:
         conn.execute(text(q))
         conn.commit()
+
+def get_user_end_time(eng, user_id):
+
+    q = f"SELECT * FROM subs WHERE subs_id = {user_id}"
+
+    with eng.begin() as conn:
+        df = pd.read_sql(q, conn)
+    
+    end_time = df['date_end'][0]
+    
+    return end_time

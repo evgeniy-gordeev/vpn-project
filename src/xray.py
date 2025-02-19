@@ -4,7 +4,7 @@ import base64
 import paramiko
 
 from urllib.parse import urlparse
-
+from src.database import get_urls_from_db, add_url_to_db
 
 class CmdError(Exception):
     pass
@@ -20,7 +20,8 @@ class AddUserError(Exception):
 
 class XRaySSHInterface(object):
     
-    def __init__(self, host_ip, known_hosts=None, username=None, password=None, sudo_flg=True, sudo_password=None):
+    def __init__(self, host_ip, known_hosts=None, username=None, password=None, 
+                 sudo_flg=True, sudo_password=None):
         
         self.host_ip = host_ip
         self.client = paramiko.SSHClient()
@@ -197,9 +198,38 @@ class XRaySSHInterface(object):
             self.client.close()
 
 
-def encode_urls(urls):
+def encode_urls(urls, encode_flg=True):
     
     url_str = '\n'.join(urls)
-    encoded_url = base64.b64encode(url_str.encode()).decode()
+    if encode_flg:
+        encoded_url = base64.b64encode(url_str.encode()).decode()
+    else:
+        encoded_url = url_str
     
     return encoded_url
+
+
+def cook_user_xray_link(engine, user_id, host_ids=[0]):
+    
+    # проверить наличие урлов юзеров в базе
+    urls = get_urls_from_db(engine, user_id, host_ids)
+    
+    if len(urls) == 0:
+        
+        for id_ in host_ids:
+            cwd_xray = "easy-xray-main"
+            
+            xray_ssh_client = XRaySSHInterface(host_ip=os.environ[f'HOST_{id_}'],
+                                               username=os.environ[f'USER_{id_}'],
+                                               password=os.environ[f'PASS_{id_}'],
+                                               sudo_password=os.environ[f'PASS_{id_}'])
+            
+            xray_ssh_client.add_xray_user(user_id, cwd=cwd_xray) # создаем конфиг в xray
+            url = xray_ssh_client.get_xray_url(user_id, cwd=cwd_xray) # генерим урл
+            urls.append(url)
+            
+            add_url_to_db(engine, user_id, id_, url) # добавляем урл в базу
+            
+    # xray_link = encode_urls(urls, encode_flg=True) # кодируем урлы
+    
+    return urls
