@@ -103,16 +103,23 @@ def _help(message):
 
 @bot.callback_query_handler(lambda query: query.data == 'make_config')
 def make_config(query):
-    bot.edit_message_text(
-        chat_id=query.from_user.id,
-        text=f"Делаю конфиг",
-        message_id=query.message.id,
-    )
-    urls = cook_user_xray_link(user_id=query.from_user.id,
-                               host_ids=HOST_IDS)
-    bot.send_message(query.from_user.id, text='Готово! Скопируй следующие ссылки в свое приложение:')
-    for url in urls:
-        bot.send_message(query.from_user.id, text=f'{url}')
+
+    user_id = query.from_user.id
+
+    if not is_active_user(user_id):
+        response = "У вас нет активной подписки"
+        bot.send_message(query.from_user.id, text=response)
+
+    else:
+        bot.edit_message_text(
+            chat_id=query.from_user.id,
+            text=f"Делаю конфиг",
+            message_id=query.message.id,
+        )
+        urls = cook_user_xray_link(engine=engine, user_id=user_id, host_ids=HOST_IDS)
+        bot.send_message(user_id, text='Готово! Скопируй следующие ссылки в свое приложение:')
+        for url in urls:
+            bot.send_message(query.from_user.id, text=f'{url}')
 
 
 @bot.callback_query_handler(lambda query: query.data in ["pay_1_month", "pay_4_month", "pay_12_month"])
